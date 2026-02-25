@@ -1,32 +1,30 @@
-# ── Backend (Laravel) ──────────────────────────────────────────────────────
-backend/vendor/
-backend/public/build
-backend/public/storage
-backend/public/hot
-backend/storage/logs/*.log
-backend/storage/framework/cache/data/*
-backend/storage/framework/sessions/*
-backend/storage/framework/views/*
-backend/bootstrap/cache/*
-backend/.env
-backend/.env.backup
-backend/.env.production
-backend/.phpunit.result.cache
-backend/.phpactor.json
-backend/auth.json
+/vendor/
+node_modules/
+npm-debug.log
+yarn-error.log
 
-# ── Frontend (Next.js) ─────────────────────────────────────────────────────
-frontend/node_modules/
-frontend/.next/
-frontend/out/
-frontend/.env
-frontend/.env.local
-frontend/.env.*.local
-frontend/next-env.d.ts
+# Laravel 4 specific
+bootstrap/compiled.php
+app/storage/
 
-# ── Common ─────────────────────────────────────────────────────────────────
-.DS_Store
-*.pem
-npm-debug.log*
-yarn-error.log*
-yarn-debug.log*
+# Laravel 5 & Lumen specific
+public/storage
+public/hot
+
+# Laravel 5 & Lumen specific with changed public path
+public_html/storage
+public_html/hot
+
+storage/*.key
+.env
+Homestead.yaml
+Homestead.json
+/.vagrant
+.phpunit.result.cache
+
+/public/build
+/storage/pail
+.env.backup
+.env.production
+.phpactor.json
+auth.json
