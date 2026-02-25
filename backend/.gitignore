@@ -1,0 +1,28 @@
+/vendor/
+/node_modules/
+npm-debug.log
+yarn-error.log
+
+# Laravel specific
+public/storage
+public/hot
+public/build
+storage/*.key
+storage/logs/*.log
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+.phpactor.json
+auth.json
+Homestead.yaml
+Homestead.json
+/.vagrant
+
+# Composer
+composer.phar
