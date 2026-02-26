@@ -25,6 +25,22 @@ public function coverImage()
 {
     return $this->hasOne(DestinationImage::class)->where('is_cover', true);
 }
+
+
+protected $fillable = [
+    'category_id',
+    'district_id',
+    'title',
+    'slug',
+    'summary',
+    'description',
+    'latitude',
+    'longitude',
+    'best_months',
+    'is_featured',
+    'is_published',
+];
+
 }
 
 
