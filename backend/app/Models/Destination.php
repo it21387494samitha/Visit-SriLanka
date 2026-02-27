@@ -27,6 +27,7 @@ public function coverImage()
 }
 
 
+
 protected $fillable = [
     'category_id',
     'district_id',

@@ -13,5 +13,9 @@ public function destinations()
     return $this->hasMany(Destination::class);
 }
 
+protected $fillable = [
+    'name',
+    'slug'
+];
 
 }

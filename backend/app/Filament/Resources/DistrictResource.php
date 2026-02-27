@@ -12,6 +12,13 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\TextInput;
+use illuminate\Support\Str;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+
+
 
 class DistrictResource extends Resource
 {
@@ -23,7 +30,14 @@ class DistrictResource extends Resource
     {
         return $form
             ->schema([
-                //
+                TextInput::make('name')
+                    ->required()
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
+
+                TextInput::make('slug')
+                    ->required()
+                    ->unique(ignoreRecord: true),
             ]);
     }
 
@@ -31,13 +45,20 @@ class DistrictResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('name')->searchable()->sortable(),
+                TextColumn::make('slug')->searchable()->sortable(),
+                TextColumn::make('created_at')->searchable()->sortable()
             ])
             ->filters([
-                //
+                Filter::make('created_at')
+    ->form([
+        Forms\Components\DatePicker::make('created_from'),
+        Forms\Components\DatePicker::make('created_until')->default(now()),
+                ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
