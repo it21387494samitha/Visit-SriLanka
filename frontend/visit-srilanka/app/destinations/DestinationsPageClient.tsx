@@ -1,263 +1,199 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, X, MapPin, SlidersHorizontal } from 'lucide-react';
-import { Destination, Category, District } from '@/lib/types';
-import DestinationCard from '@/components/ui/DestinationCard';
-import ScrollReveal from '@/components/ui/ScrollReveal';
-import AnimatedText from '@/components/ui/AnimatedText';
-import dynamic from 'next/dynamic';
-
-const ParticleField = dynamic(() => import('@/components/three/ParticleField'), {
-  ssr: false,
-});
+import { useCallback, useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Search, X } from 'lucide-react';
+import DestinationPlate from '@/components/ui/DestinationPlate';
+import type { Category, Destination, District } from '@/lib/types';
+import { entryCount } from '@/lib/format';
 
 interface Props {
-  initialDestinations: Destination[];
+  destinations: Destination[];
   categories: Category[];
   districts: District[];
-  totalPages: number;
 }
 
 export default function DestinationsPageClient({
-  initialDestinations,
+  destinations,
   categories,
   districts,
 }: Props) {
-  const [destinations, setDestinations] = useState(initialDestinations);
-  const [filtered, setFiltered] = useState(initialDestinations);
-  const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
+  const router = useRouter();
+  const params = useSearchParams();
 
-  useEffect(() => {
-    let result = destinations;
-    if (search) {
-      const q = search.toLowerCase();
-      result = result.filter(
-        (d) =>
-          d.title.toLowerCase().includes(q) ||
-          d.summary?.toLowerCase().includes(q)
-      );
-    }
-    if (selectedCategory) {
-      result = result.filter((d) => d.category?.slug === selectedCategory);
-    }
-    if (selectedDistrict) {
-      result = result.filter((d) => d.district?.slug === selectedDistrict);
-    }
-    setFiltered(result);
-  }, [search, selectedCategory, selectedDistrict, destinations]);
+  const category = params.get('category') ?? '';
+  const district = params.get('district') ?? '';
+  const [search, setSearch] = useState(params.get('q') ?? '');
 
-  const clearFilters = () => {
+  /* Filters live in the URL so a filtered view can be linked to — the map on
+     the home page depends on this. Search stays local; it changes per keystroke
+     and doesn't belong in history. */
+  const setParam = useCallback(
+    (key: string, value: string) => {
+      const next = new URLSearchParams(params.toString());
+      if (value) next.set(key, value);
+      else next.delete(key);
+      const qs = next.toString();
+      router.replace(qs ? `/destinations?${qs}` : '/destinations', { scroll: false });
+    },
+    [params, router]
+  );
+
+  const clearAll = () => {
     setSearch('');
-    setSelectedCategory(null);
-    setSelectedDistrict(null);
+    router.replace('/destinations', { scroll: false });
   };
 
-  const hasActiveFilters = search || selectedCategory || selectedDistrict;
+  const results = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return destinations.filter((d) => {
+      if (category && d.category?.slug !== category) return false;
+      if (district && d.district?.slug !== district) return false;
+      if (!q) return true;
+      return (
+        d.title.toLowerCase().includes(q) ||
+        (d.summary ?? '').toLowerCase().includes(q) ||
+        (d.district?.name ?? '').toLowerCase().includes(q) ||
+        (d.category?.name ?? '').toLowerCase().includes(q)
+      );
+    });
+  }, [destinations, category, district, search]);
+
+  const activeCount = [category, district, search.trim()].filter(Boolean).length;
+
+  const districtName = districts.find((d) => d.slug === district)?.name;
+  const categoryName = categories.find((c) => c.slug === category)?.name;
+
+  const selectClass =
+    'w-full appearance-none border border-rule bg-paper px-3 py-2.5 pr-8 font-mono text-[0.8125rem] text-ink transition-colors hover:border-laterite focus:border-laterite focus:outline-none';
 
   return (
-    <div className="relative min-h-screen">
-      {/* Hero section */}
-      <section className="relative h-[50vh] min-h-[400px] flex items-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-emerald-950/30 via-black/50 to-black" />
-        <ParticleField />
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 w-full pt-20">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6">
-              <MapPin className="w-4 h-4 text-emerald-400" />
-              <span className="text-emerald-300 text-sm font-medium">
-                {filtered.length} Destinations
-              </span>
-            </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-              All{' '}
-              <span className="bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">
-                Destinations
-              </span>
-            </h1>
-            <p className="text-white/50 text-lg max-w-xl">
-              Explore every corner of Sri Lanka&apos;s paradise. Filter by category,
-              district, or search for your dream destination.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Filters */}
-      <section className="relative -mt-8 z-10 max-w-7xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10"
-        >
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
+    <>
+      {/* Filter ledger */}
+      <div className="border-b border-rule bg-paper-deep">
+        <div className="mx-auto max-w-page px-5 py-5 sm:px-8">
+          <div className="grid gap-3 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)_auto] md:items-center">
+            <div className="relative">
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint"
+                aria-hidden
+              />
               <input
-                type="text"
+                type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search destinations..."
-                className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                placeholder="Search entries, districts, categories…"
+                aria-label="Search the catalogue"
+                className="w-full border border-rule bg-paper py-2.5 pl-10 pr-3 font-mono text-[0.8125rem] text-ink placeholder:text-ink-faint focus:border-laterite focus:outline-none"
               />
             </div>
 
-            {/* Filter toggle (mobile) */}
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="md:hidden flex items-center justify-center gap-2 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/60 hover:text-white transition-colors"
-            >
-              <SlidersHorizontal className="w-5 h-5" />
-              Filters
-            </button>
-
-            {/* Desktop filters */}
-            <div className="hidden md:flex gap-3">
+            <div className="relative">
+              <label htmlFor="filter-category" className="sr-only">
+                Filter by category
+              </label>
               <select
-                value={selectedCategory || ''}
-                onChange={(e) => setSelectedCategory(e.target.value || null)}
-                className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/70 focus:outline-none focus:border-emerald-500/50 transition-colors appearance-none cursor-pointer min-w-[160px]"
+                id="filter-category"
+                value={category}
+                onChange={(e) => setParam('category', e.target.value)}
+                className={selectClass}
               >
-                <option value="">All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.slug} className="bg-black">
-                    {cat.name}
+                <option value="">All categories</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.slug}>
+                    {c.name}
                   </option>
                 ))}
               </select>
-
-              <select
-                value={selectedDistrict || ''}
-                onChange={(e) => setSelectedDistrict(e.target.value || null)}
-                className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/70 focus:outline-none focus:border-emerald-500/50 transition-colors appearance-none cursor-pointer min-w-[160px]"
+              <span
+                aria-hidden
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint"
               >
-                <option value="">All Districts</option>
-                {districts.map((dist) => (
-                  <option key={dist.id} value={dist.slug} className="bg-black">
-                    {dist.name}
-                  </option>
-                ))}
-              </select>
-
-              {hasActiveFilters && (
-                <button
-                  onClick={clearFilters}
-                  className="flex items-center gap-2 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 hover:bg-red-500/20 transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                  Clear
-                </button>
-              )}
+                ▾
+              </span>
             </div>
-          </div>
 
-          {/* Mobile filters dropdown */}
-          <AnimatePresence>
-            {showFilters && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="md:hidden overflow-hidden"
+            <div className="relative">
+              <label htmlFor="filter-district" className="sr-only">
+                Filter by district
+              </label>
+              <select
+                id="filter-district"
+                value={district}
+                onChange={(e) => setParam('district', e.target.value)}
+                className={selectClass}
               >
-                <div className="flex flex-col gap-3 pt-4 mt-4 border-t border-white/10">
-                  <select
-                    value={selectedCategory || ''}
-                    onChange={(e) => setSelectedCategory(e.target.value || null)}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/70 focus:outline-none focus:border-emerald-500/50"
-                  >
-                    <option value="">All Categories</option>
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.slug} className="bg-black">
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
+                <option value="">All districts</option>
+                {districts.map((d) => (
+                  <option key={d.id} value={d.slug}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+              <span
+                aria-hidden
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint"
+              >
+                ▾
+              </span>
+            </div>
 
-                  <select
-                    value={selectedDistrict || ''}
-                    onChange={(e) => setSelectedDistrict(e.target.value || null)}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/70 focus:outline-none focus:border-emerald-500/50"
-                  >
-                    <option value="">All Districts</option>
-                    {districts.map((dist) => (
-                      <option key={dist.id} value={dist.slug} className="bg-black">
-                        {dist.name}
-                      </option>
-                    ))}
-                  </select>
-
-                  {hasActiveFilters && (
-                    <button
-                      onClick={clearFilters}
-                      className="flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400"
-                    >
-                      <X className="w-4 h-4" />
-                      Clear All Filters
-                    </button>
-                  )}
-                </div>
-              </motion.div>
+            {activeCount > 0 ? (
+              <button
+                type="button"
+                onClick={clearAll}
+                className="t-label flex items-center justify-center gap-1.5 border border-rule px-4 py-2.5 text-ink-soft transition-colors hover:border-laterite hover:text-laterite"
+              >
+                <X className="h-3.5 w-3.5" aria-hidden />
+                Clear
+              </button>
+            ) : (
+              <span className="t-label hidden text-right text-ink-faint md:block">
+                {entryCount(results.length)}
+              </span>
             )}
-          </AnimatePresence>
-        </motion.div>
-      </section>
+          </div>
+        </div>
+      </div>
 
       {/* Results */}
-      <section className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
-        {filtered.length > 0 ? (
-          <motion.div
-            layout
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            <AnimatePresence mode="popLayout">
-              {filtered.map((dest, i) => (
-                <motion.div
-                  key={dest.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.4, delay: i * 0.05 }}
-                >
-                  <DestinationCard destination={dest} index={i} />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
+      <div className="mx-auto max-w-page px-5 py-12 sm:px-8">
+        <div className="rule-head mb-8">
+          <span className="t-label shrink-0 text-ink-soft">
+            {entryCount(results.length)}
+            {categoryName ? ` · ${categoryName}` : ''}
+            {districtName ? ` · ${districtName} District` : ''}
+          </span>
+        </div>
+
+        {results.length > 0 ? (
+          <div className="grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+            {results.map((d, i) => (
+              <DestinationPlate
+                key={d.id}
+                destination={d}
+                priority={i < 3}
+                sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw"
+              />
+            ))}
+          </div>
         ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-20"
-          >
-            <div className="text-6xl mb-6">🔍</div>
-            <h3 className="text-2xl font-semibold text-white mb-2">
-              No destinations found
-            </h3>
-            <p className="text-white/40 mb-6">
-              Try adjusting your filters or search terms.
+          <div className="border-t border-rule py-20 text-center">
+            <p className="t-h3 text-ink">Nothing filed under that</p>
+            <p className="t-body measure mx-auto mt-3">
+              No entry matches the current filters. Widen the search, or clear it
+              and start again.
             </p>
             <button
-              onClick={clearFilters}
-              className="px-6 py-3 bg-emerald-500/20 text-emerald-300 rounded-full border border-emerald-500/30 hover:bg-emerald-500/30 transition-colors"
+              type="button"
+              onClick={clearAll}
+              className="t-label mt-6 bg-ink px-6 py-3 text-paper transition-colors hover:bg-laterite"
             >
-              Clear All Filters
+              Clear filters
             </button>
-          </motion.div>
+          </div>
         )}
-      </section>
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,219 +1,502 @@
 @import "tailwindcss";
 
-/* ===== Custom Theme ===== */
+/* ============================================================
+   CEYLON ARCHIVE — design tokens
+   Ground is manila/kraft paper; ink is warm and brown-biased.
+   One accent (laterite, the island's red earth). Gold is reserved
+   for hairline rules and stencilled numerals, never for prose.
+   ============================================================ */
+
 :root {
-  --bg-primary: #000000;
-  --bg-secondary: #0a0a0a;
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.5);
-  --accent-emerald: #10b981;
-  --accent-teal: #14b8a6;
-  --accent-cyan: #06b6d4;
-  --accent-amber: #f59e0b;
+  /* grounds */
+  --c-paper: #efe9dc;
+  --c-paper-deep: #e3dbc9;
+  --c-paper-edge: #d5cab3;
+
+  /* ink */
+  --c-ink: #191512;
+  --c-ink-soft: #5a5044;
+  --c-ink-faint: #6f6555;
+
+  /* accent + marks */
+  --c-laterite: #b04221;
+  --c-laterite-deep: #8c3319;
+  --c-gold: #7a5d1c;
+  --c-tea: #2e3b2c;
+
+  /* semantic surfaces */
+  --c-surface: #f5f1e7;
+  --c-rule: #c6b894;
+  --c-rule-strong: #7a5d1c;
+
+  /* inverted band (used for full-bleed dark sections in light theme) */
+  --c-band: #21281c;
+  --c-band-ink: #ece6d7;
+  --c-band-ink-soft: #a49b87;
+
+  /* map — land must sit clearly off the paper, and boundaries must be read
+     at 400px wide, so these are their own ramp rather than reused surfaces */
+  --c-map-land: #cbbb96;
+  --c-map-empty: #ded5be;
+  --c-map-line: #8a7647;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-paper: #14170f;
+    --c-paper-deep: #1b1f16;
+    --c-paper-edge: #2b3125;
+
+    --c-ink: #ede7d9;
+    --c-ink-soft: #a79e8b;
+    --c-ink-faint: #948b78;
+
+    --c-laterite: #e07b4f;
+    --c-laterite-deep: #f0956b;
+    --c-gold: #c9a44c;
+    --c-tea: #9bb08f;
+
+    --c-surface: #1a1e14;
+    --c-rule: #363d2d;
+    --c-rule-strong: #c9a44c;
+
+    --c-band: #0d0f09;
+    --c-band-ink: #ede7d9;
+    --c-band-ink-soft: #a79e8b;
+
+    --c-map-land: #414c31;
+    --c-map-empty: #262c1d;
+    --c-map-line: #758554;
+
+    color-scheme: dark;
+  }
+}
+
+/* Explicit toggle must beat the media query in BOTH directions. */
+:root[data-theme="light"] {
+  --c-paper: #efe9dc;
+  --c-paper-deep: #e3dbc9;
+  --c-paper-edge: #d5cab3;
+  --c-ink: #191512;
+  --c-ink-soft: #5a5044;
+  --c-ink-faint: #6f6555;
+  --c-laterite: #b04221;
+  --c-laterite-deep: #8c3319;
+  --c-gold: #7a5d1c;
+  --c-tea: #2e3b2c;
+  --c-surface: #f5f1e7;
+  --c-rule: #c6b894;
+  --c-rule-strong: #7a5d1c;
+  --c-band: #21281c;
+  --c-band-ink: #ece6d7;
+  --c-band-ink-soft: #a49b87;
+  --c-map-land: #cbbb96;
+  --c-map-empty: #ded5be;
+  --c-map-line: #8a7647;
+
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --c-paper: #14170f;
+  --c-paper-deep: #1b1f16;
+  --c-paper-edge: #2b3125;
+  --c-ink: #ede7d9;
+  --c-ink-soft: #a79e8b;
+  --c-ink-faint: #948b78;
+  --c-laterite: #e07b4f;
+  --c-laterite-deep: #f0956b;
+  --c-gold: #c9a44c;
+  --c-tea: #9bb08f;
+  --c-surface: #1a1e14;
+  --c-rule: #363d2d;
+  --c-rule-strong: #c9a44c;
+  --c-band: #0d0f09;
+  --c-band-ink: #ede7d9;
+  --c-band-ink-soft: #a79e8b;
+  --c-map-land: #414c31;
+  --c-map-empty: #262c1d;
+  --c-map-line: #758554;
+
+  color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--bg-primary);
-  --color-foreground: var(--text-primary);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--c-paper);
+  --color-paper-deep: var(--c-paper-deep);
+  --color-paper-edge: var(--c-paper-edge);
+  --color-surface: var(--c-surface);
+  --color-ink: var(--c-ink);
+  --color-ink-soft: var(--c-ink-soft);
+  --color-ink-faint: var(--c-ink-faint);
+  --color-laterite: var(--c-laterite);
+  --color-laterite-deep: var(--c-laterite-deep);
+  --color-gold: var(--c-gold);
+  --color-tea: var(--c-tea);
+  --color-rule: var(--c-rule);
+  --color-rule-strong: var(--c-rule-strong);
+  --color-band: var(--c-band);
+  --color-band-ink: var(--c-band-ink);
+  --color-band-ink-soft: var(--c-band-ink-soft);
+  --color-map-land: var(--c-map-land);
+  --color-map-empty: var(--c-map-empty);
+  --color-map-line: var(--c-map-line);
+
+  --font-display: var(--font-big-shoulders), "Haettenschweiler", "Arial Narrow", sans-serif;
+  --font-body: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* The page measure — every full-width band aligns to this. */
+  --container-page: 86rem;
 }
 
-/* ===== Base Styles ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* ============================================================
+   Base — element defaults. In @layer base so every Tailwind
+   utility (which lands in @layer utilities) can override them.
+   ============================================================ */
 
-html {
-  /* Lenis handles smooth scroll — disable native */
-  scroll-behavior: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Lenis smooth-scroll overrides */
-html.lenis, html.lenis body {
-  height: auto;
-}
-.lenis.lenis-smooth {
-  scroll-behavior: auto;
-}
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
-.lenis.lenis-scrolling iframe {
-  pointer-events: none;
-}
-
-body {
-  background-color: #000000;
-  color: #ffffff;
-  overflow-x: hidden;
-  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
-}
-
-/* ===== Selection ===== */
-::selection {
-  background-color: rgba(20, 184, 166, 0.3);
-  color: #ffffff;
-}
-
-/* ===== Scrollbar ===== */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #000000;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(20, 184, 166, 0.3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(20, 184, 166, 0.5);
-}
-
-/* ===== Custom Animations ===== */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
   }
-  50% {
-    transform: translateY(-10px);
-  }
-}
 
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+    text-size-adjust: 100%;
   }
-  100% {
-    background-position: 200% 0;
+
+  body {
+    margin: 0;
+    background-color: var(--c-paper);
+    color: var(--c-ink);
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    font-synthesis-weight: none;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: var(--c-laterite);
+    color: var(--c-paper);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 0.94;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    color: var(--c-ink);
+  }
+
+  p { margin: 0; }
+
+  a { color: inherit; text-decoration: none; }
+
+  :focus-visible {
+    outline: 2px solid var(--c-laterite);
+    outline-offset: 3px;
+    border-radius: 1px;
   }
 }
 
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(20, 184, 166, 0.2);
+/* ============================================================
+   Components — every named class the markup uses. In
+   @layer components so utilities still win on the element.
+   ============================================================ */
+
+@layer components {
+
+
+
+
+
+  /* ============================================================
+     Typography
+     Display face is condensed signage — it needs tight tracking and
+     a hard cap on line-height or it reads as a poster, not a page.
+     ============================================================ */
+
+  .t-display {
+    font-family: var(--font-display);
+    font-weight: 700;
+    /* Condensed faces run large fast — cap it well below the viewport width or
+       the masthead eats the fold. */
+    font-size: clamp(2.75rem, 6.2vw, 5.25rem);
+    line-height: 0.88;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
   }
-  50% {
-    box-shadow: 0 0 40px rgba(20, 184, 166, 0.4);
+
+  .t-h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.25rem, 4.6vw, 3.75rem);
+    line-height: 0.92;
+    letter-spacing: -0.018em;
+    text-transform: uppercase;
+  }
+
+  .t-h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.9rem, 4vw, 3.1rem);
+    line-height: 0.95;
+    letter-spacing: -0.015em;
+    text-transform: uppercase;
+  }
+
+  .t-h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.35rem, 2.2vw, 1.85rem);
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+  }
+
+  /* Stencilled label — crate-mark register. */
+  .t-label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--c-ink-soft);
+  }
+
+  /* Catalogue / coordinate data. */
+  .t-data {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+
+  .t-lede {
+    font-size: clamp(1.125rem, 1.6vw, 1.375rem);
+    line-height: 1.55;
+    color: var(--c-ink-soft);
+    text-wrap: pretty;
+  }
+
+  .t-body { color: var(--c-ink-soft); text-wrap: pretty; }
+
+  /* Running prose caps at ~65 characters. */
+  .measure { max-width: 34em; }
+  .measure-tight { max-width: 26em; }
+
+  .tabular { font-variant-numeric: tabular-nums; }
+
+  /* ============================================================
+     Rules — the ledger system
+     ============================================================ */
+
+  .rule {
+    border: 0;
+    height: 1px;
+    margin: 0;
+    background-color: var(--c-rule);
+  }
+
+  .rule-strong {
+    border: 0;
+    height: 2px;
+    margin: 0;
+    background-color: var(--c-rule-strong);
+  }
+
+  /* Label sitting on a rule that runs to the end of the column. */
+  .rule-head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .rule-head::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: var(--c-rule);
+  }
+
+  /* ============================================================
+     Links & focus
+     ============================================================ */
+
+  .link-underline {
+    background-image: linear-gradient(var(--c-laterite), var(--c-laterite));
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  /* ============================================================
+     Plates — the photographic unit of the catalogue
+     ============================================================ */
+
+  .plate {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--c-paper-deep);
+  }
+
+  .plate-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Archive plates are printed, not screen-bright. */
+    filter: saturate(0.86) contrast(1.04);
+    transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
+      filter 0.6s ease;
+  }
+
+  .group:hover .plate-img,
+  .group:focus-visible .plate-img {
+    transform: scale(1.04);
+    filter: saturate(1) contrast(1.02);
+  }
+
+  /* ============================================================
+     Reveal — visible by default; JS only opts elements INTO motion.
+     If JS never runs, or motion is reduced, content is simply there.
+     ============================================================ */
+
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+
+  [data-reveal][data-reveal-armed="true"] {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  [data-reveal][data-reveal-shown="true"] {
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1),
+      transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* ============================================================
+     Map
+     ============================================================ */
+
+  .district {
+    fill: var(--c-map-land);
+    stroke: var(--c-map-line);
+    stroke-width: 1.1;
+    stroke-linejoin: round;
+    transition: fill 0.25s ease, stroke 0.25s ease;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .district:hover,
+  .district[data-active="true"] {
+    fill: var(--c-laterite);
+    stroke: var(--c-laterite-deep);
+  }
+
+  /* Districts with no entries stay legible as land, but read as inactive. */
+  .district[data-empty="true"] {
+    cursor: default;
+    fill: var(--c-map-empty);
+    stroke: var(--c-map-line);
+  }
+  .district[data-empty="true"]:hover {
+    fill: var(--c-map-empty);
+    stroke: var(--c-map-line);
+  }
+
+  .district:focus-visible {
+    stroke: var(--c-ink);
+    stroke-width: 2;
+  }
+
+  /* ============================================================
+     Prose (API-authored description HTML)
+     ============================================================ */
+
+  .prose-archive { color: var(--c-ink-soft); }
+  .prose-archive > * + * { margin-top: 1.15em; }
+  .prose-archive h2,
+  .prose-archive h3,
+  .prose-archive h4 {
+    font-family: var(--font-display);
+    color: var(--c-ink);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    margin-top: 1.8em;
+  }
+  .prose-archive h2 { font-size: 1.7rem; }
+  .prose-archive h3 { font-size: 1.35rem; }
+  .prose-archive a {
+    color: var(--c-laterite);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose-archive strong { color: var(--c-ink); font-weight: 600; }
+  .prose-archive ul,
+  .prose-archive ol { padding-left: 1.4em; }
+  .prose-archive li + li { margin-top: 0.4em; }
+  .prose-archive blockquote {
+    border-left: 2px solid var(--c-laterite);
+    padding-left: 1.2em;
+    font-style: italic;
+    color: var(--c-ink);
+  }
+  .prose-archive img { width: 100%; height: auto; }
+
+  /* ============================================================
+     Scrollbar
+     ============================================================ */
+
+  @supports selector(::-webkit-scrollbar) {
+    ::-webkit-scrollbar { width: 12px; height: 12px; }
+    ::-webkit-scrollbar-track { background: var(--c-paper-deep); }
+    ::-webkit-scrollbar-thumb {
+      background: var(--c-rule);
+      border: 3px solid var(--c-paper-deep);
+      border-radius: 6px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--c-ink-faint); }
   }
 }
 
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
+/* ============================================================
+   Motion preferences
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-  50% {
-    background-position: 100% 50%;
+  [data-reveal],
+  [data-reveal][data-reveal-armed="true"] {
+    opacity: 1 !important;
+    transform: none !important;
   }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-.animate-shimmer {
-  background-size: 200% auto;
-  animation: shimmer 3s linear infinite;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 3s ease-in-out infinite;
-}
-
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient-shift 6s ease infinite;
-}
-
-/* ===== Glassmorphism ===== */
-.glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.glass-hover:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-/* ===== Gradient Text ===== */
-.gradient-text {
-  background: linear-gradient(135deg, #10b981, #14b8a6, #06b6d4);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ===== Glow Effects ===== */
-.glow-emerald {
-  box-shadow: 0 0 30px rgba(16, 185, 129, 0.15);
-}
-
-.glow-emerald-hover:hover {
-  box-shadow: 0 0 40px rgba(16, 185, 129, 0.25);
-}
-
-/* ===== Text Gradient Animation ===== */
-.text-gradient-animated {
-  background: linear-gradient(90deg, #10b981, #14b8a6, #06b6d4, #10b981);
-  background-size: 300% 100%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: gradient-shift 4s ease infinite;
-}
-
-/* ===== Card hover ===== */
-.card-hover {
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.card-hover:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-}
-
-/* ===== Rich text content styling ===== */
-.prose-dark {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.prose-dark h1,
-.prose-dark h2,
-.prose-dark h3,
-.prose-dark h4 {
-  color: #ffffff;
-  font-weight: 700;
-}
-
-.prose-dark a {
-  color: #14b8a6;
-}
-
-.prose-dark blockquote {
-  border-left: 3px solid #14b8a6;
-  padding-left: 1rem;
-  font-style: italic;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.prose-dark img {
-  border-radius: 1rem;
+  .group:hover .plate-img { transform: none; }
 }
