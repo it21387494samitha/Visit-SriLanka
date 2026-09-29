@@ -5,7 +5,6 @@ import { getCategories, getDestinations } from '@/lib/api';
 import { categoryImage } from '@/lib/images';
 import { entryCount } from '@/lib/format';
 import PageHeader from '@/components/layout/PageHeader';
-import SampleNotice from '@/components/ui/SampleNotice';
 import Reveal from '@/components/ui/Reveal';
 
 export const metadata: Metadata = {
@@ -20,8 +19,6 @@ export default async function CategoriesPage() {
 
   return (
     <>
-      {categories.live && all.live ? null : <SampleNotice />}
-
       <PageHeader
         label="Headings"
         title="Filed under"

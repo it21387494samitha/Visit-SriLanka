@@ -4,7 +4,6 @@ import { getCategory } from '@/lib/api';
 import { entryCount } from '@/lib/format';
 import DestinationPlate from '@/components/ui/DestinationPlate';
 import PageHeader from '@/components/layout/PageHeader';
-import SampleNotice from '@/components/ui/SampleNotice';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -23,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CategoryPage({ params }: Props) {
   const { slug } = await params;
-  const { data, live } = await getCategory(slug);
+  const { data } = await getCategory(slug);
   if (!data) notFound();
 
   const { category, destinations } = data;
@@ -37,8 +36,6 @@ export default async function CategoryPage({ params }: Props) {
 
   return (
     <>
-      {live ? null : <SampleNotice />}
-
       <PageHeader
         label="Heading"
         title={category.name}

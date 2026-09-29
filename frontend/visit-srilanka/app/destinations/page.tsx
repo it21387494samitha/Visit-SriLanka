@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import DestinationsPageClient from './DestinationsPageClient';
-import SampleNotice from '@/components/ui/SampleNotice';
 import PageHeader from '@/components/layout/PageHeader';
 import { getCategories, getDestinations, getDistricts } from '@/lib/api';
 
@@ -18,11 +17,8 @@ export default async function DestinationsPage() {
     getDistricts(),
   ]);
 
-  const live = destinations.live && categories.live && districts.live;
-
   return (
     <>
-      {live ? null : <SampleNotice />}
       <PageHeader
         label="The catalogue"
         title="Every entry"

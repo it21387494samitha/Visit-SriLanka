@@ -7,7 +7,6 @@ import { coverImage, galleryImages } from '@/lib/images';
 import { catalogueNumber, formatCoords, toPlainText } from '@/lib/format';
 import DestinationPlate from '@/components/ui/DestinationPlate';
 import LocatorMap from '@/components/map/LocatorMap';
-import SampleNotice from '@/components/ui/SampleNotice';
 import { Gallery, ShareButton } from './DestinationDetailClient';
 
 interface Props {
@@ -38,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function DestinationPage({ params }: Props) {
   const { slug } = await params;
-  const { data, live } = await getDestination(slug);
+  const { data } = await getDestination(slug);
   if (!data) notFound();
 
   const { destination, related } = data;
@@ -64,8 +63,6 @@ export default async function DestinationPage({ params }: Props) {
 
   return (
     <>
-      {live ? null : <SampleNotice />}
-
       <article className="mx-auto max-w-page px-5 pt-10 sm:px-8 sm:pt-14">
         <Link
           href="/destinations"
