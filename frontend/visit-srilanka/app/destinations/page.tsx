@@ -1,25 +1,45 @@
-import { Metadata } from 'next';
-import { getDestinations, getCategories, getDistricts } from '@/lib/api';
+import { Suspense } from 'react';
+import type { Metadata } from 'next';
 import DestinationsPageClient from './DestinationsPageClient';
+import SampleNotice from '@/components/ui/SampleNotice';
+import PageHeader from '@/components/layout/PageHeader';
+import { getCategories, getDestinations, getDistricts } from '@/lib/api';
 
 export const metadata: Metadata = {
-  title: 'Destinations — Visit Sri Lanka',
-  description: 'Discover all the amazing destinations Sri Lanka has to offer.',
+  title: 'The catalogue',
+  description:
+    'Every catalogued destination in Sri Lanka, filterable by district and category, with coordinates and seasons.',
 };
 
 export default async function DestinationsPage() {
-  const [destinationsData, categories, districts] = await Promise.all([
+  const [destinations, categories, districts] = await Promise.all([
     getDestinations(),
     getCategories(),
     getDistricts(),
   ]);
 
+  const live = destinations.live && categories.live && districts.live;
+
   return (
-    <DestinationsPageClient
-      initialDestinations={destinationsData.data}
-      categories={categories}
-      districts={districts}
-      totalPages={destinationsData.last_page}
-    />
+    <>
+      {live ? null : <SampleNotice />}
+      <PageHeader
+        label="The catalogue"
+        title="Every entry"
+        lede="Filed by district, cross-cut by category. Filter it down, or read straight through."
+        figures={[
+          { value: destinations.data.total, label: 'Entries' },
+          { value: districts.data.length, label: 'Districts' },
+          { value: categories.data.length, label: 'Categories' },
+        ]}
+      />
+      <Suspense fallback={null}>
+        <DestinationsPageClient
+          destinations={destinations.data.data}
+          categories={categories.data}
+          districts={districts.data}
+        />
+      </Suspense>
+    </>
   );
 }

@@ -1,26 +1,36 @@
-import HeroSection from '@/components/sections/HeroSection';
-import FeaturedSection from '@/components/sections/FeaturedSection';
-import CategoriesSection from '@/components/sections/CategoriesSection';
-import StatsSection from '@/components/sections/StatsSection';
-import ExperiencesSection from '@/components/sections/ExperiencesSection';
-import CTASection from '@/components/sections/CTASection';
-import { getFeaturedDestinations, getCategories, getStats } from '@/lib/api';
+import Masthead from '@/components/home/Masthead';
+import SelectedEntries from '@/components/home/SelectedEntries';
+import CategoryIndex from '@/components/home/CategoryIndex';
+import SeasonChart from '@/components/home/SeasonChart';
+import ClosingBand from '@/components/home/ClosingBand';
+import SampleNotice from '@/components/ui/SampleNotice';
+import {
+  getCategories,
+  getDestinations,
+  getDistricts,
+  getFeaturedDestinations,
+  getStats,
+} from '@/lib/api';
 
-export default async function Home() {
-  const [destinations, categories, stats] = await Promise.all([
+export default async function HomePage() {
+  const [featured, categories, districts, stats, all] = await Promise.all([
     getFeaturedDestinations(),
     getCategories(),
+    getDistricts(),
     getStats(),
+    getDestinations(),
   ]);
+
+  const live = featured.live && categories.live && districts.live && stats.live;
 
   return (
     <>
-      <HeroSection />
-      <FeaturedSection destinations={destinations} />
-      <CategoriesSection categories={categories} />
-      <StatsSection stats={stats} />
-      <ExperiencesSection />
-      <CTASection />
+      {live ? null : <SampleNotice />}
+      <Masthead districts={districts.data} stats={stats.data} />
+      <SelectedEntries destinations={featured.data} />
+      <CategoryIndex categories={categories.data} destinations={all.data.data} />
+      <SeasonChart />
+      <ClosingBand />
     </>
   );
 }
